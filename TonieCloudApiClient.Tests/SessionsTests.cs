@@ -1,30 +1,31 @@
 ﻿using NUnit.Framework;
-using System;
 using System.Threading.Tasks;
-using System.Net;
 using Should;
-using RestSharp;
 
 namespace TonieCloudApiClient.Tests
 {
     public class SessionsTests
     {
-        private const string UserName = "batzi.01+tonies@mailbox.org";
-        private const string Password = "IBGpM4eN7F9uWAFFK6c2";
-
         [Test]
         public async Task CanPostSessions()
         {
-            var result = await SessionsClient.PostAsync(UserName, Password);
+            var client = await TonieClient.GetClientAsync(Credentials.UserName, Credentials.Password.ToCharArray());
 
-            result.Jwt.ShouldNotBeNull();
+            client.ShouldNotBeNull();
+        }
+    }
 
-            //var meClient = new RestClient($"{Urls.BaseUrl}/me");
-            //meClient.AddDefaultHeader("Authorization", $"Bearer {result.Jwt}");
+    public class MeTests
+    {
+        [Test]
+        public async Task CanGetMe()
+        {
+            // Vorher anmelden
+            await TonieClient.GetClientAsync(Credentials.UserName, Credentials.Password.ToCharArray());
+            var result = await TonieClient.Me.GetAsync();
 
-            //var getRequest = new RestRequest();
-
-            //var meResult = await meClient.GetAsync<object>(getRequest);
+            result.ShouldNotBeNull();
+            result.Sex.ShouldEqual("m");
         }
     }
 }
