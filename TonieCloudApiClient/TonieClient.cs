@@ -77,5 +77,14 @@ namespace TonieCloudApiClient
                 return await response.Content.ReadAsAsync<MeModel>();
             }
         }
+
+        public static class Config
+        {
+            public static async Task<ConfigModel> GetAsync()
+            {
+                using var response = (await HttpClient.GetAsync(Urls.Config)).ThrowIfNotSuccessful();
+                return await response.Content.ReadAsAsync<ConfigModel>();
+            }
+        }
     }
 }
