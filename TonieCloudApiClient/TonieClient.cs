@@ -70,20 +70,9 @@ namespace TonieCloudApiClient
 
         public static class Me
         {
-            //private static HttpClient Client;
-
             public static async Task<MeModel> GetAsync()
             {
-                //if (Client == null)
-                //{
-                //    Client = await TonieClient.GetClientAsync();
-                //}
-
-                using var response = await _httpClient.GetAsync(Urls.Me);
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw new Exception(response.ReasonPhrase);
-                }
+                using var response = (await HttpClient.GetAsync(Urls.Me)).ThrowIfNotSuccessful();
 
                 return await response.Content.ReadAsAsync<MeModel>();
             }
