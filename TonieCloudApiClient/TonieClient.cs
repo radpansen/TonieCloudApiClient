@@ -6,12 +6,17 @@ using System.Threading.Tasks;
 using TonieCloudApiClient.Config;
 using System.Linq;
 using TonieCloudApiClient.Extensions;
+using System.Collections.Generic;
+using GraphQL.Client;
+using GraphQL.Common.Request;
+using TonieCloudApiClient.GraphQL;
 
 namespace TonieCloudApiClient
 {
     public static class TonieClient
     {
         private static HttpClient HttpClient;
+        private static GraphQLClient GraphQLClient;
         private static string UserName;
         private static char[] Password;
         private static string BearerToken = null;
@@ -43,6 +48,23 @@ namespace TonieCloudApiClient
             await SetupAuthenticationAsync(client, username, password);
 
             HttpClient = client;
+            SetupGraphQLClient(client);
+        }
+
+        private static void SetupGraphQLClient(HttpClient client)
+        {
+            var graphQLClient = new GraphQLClient(client.BaseAddress);
+            
+            graphQLClient.EndPoint = new Uri($"{Urls.BaseUrl}/{Urls.GraphQl}");
+            
+            graphQLClient.DefaultRequestHeaders.Clear();
+            foreach (var header in client.DefaultRequestHeaders)
+            {
+                graphQLClient.DefaultRequestHeaders.Add(header.Key, header.Value);
+            }
+            graphQLClient.DefaultRequestHeaders.Authorization = client.DefaultRequestHeaders.Authorization;
+
+            GraphQLClient = graphQLClient;
         }
 
         private static async Task SetupAuthenticationAsync(HttpClient client, string username, char[] password)
@@ -84,6 +106,15 @@ namespace TonieCloudApiClient
             {
                 using var response = (await HttpClient.GetAsync(Urls.Config)).ThrowIfNotSuccessful();
                 return await response.Content.ReadAsAsync<ConfigModel>();
+            }
+        }
+
+        public static class GraphQl
+        {
+            public static async Task<List<NotificationModel>> GetNotificationsAsync()
+            {
+                var graphQlResponse = (await GraphQLClient.PostQueryAsync(Queries.NotificationsQuery)).ThrowIfNotSuccessful();
+                return graphQlResponse.GetDataFieldAs<List<NotificationModel>>("notifications");
             }
         }
     }

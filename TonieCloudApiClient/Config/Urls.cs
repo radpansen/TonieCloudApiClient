@@ -7,5 +7,6 @@
         public static string Sessions => "sessions";
         public static string Me => "me";
         public static string Config => "config";
+        public static string GraphQl => "graphql";
     }
 }
