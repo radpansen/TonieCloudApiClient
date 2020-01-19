@@ -14,7 +14,7 @@ namespace TonieCloudApiClient.Models
         public string OwnerName { get; set; }
         public bool ForeignCreativeTonieContent { get; set; }
 
-        public List<TonieBoxListModel> TonieBoxes { get; set; }
-        public List<CreativeTonieListModel> CreativeTonies { get; set; }
+        public List<TonieBoxModel> TonieBoxes { get; set; }
+        public List<CreativeTonieModel> CreativeTonies { get; set; }
     }
 }

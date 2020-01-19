@@ -37,6 +37,7 @@
                     live
                     private
                     imageUrl
+                    secondsRemaining
                 }
             }
             }";

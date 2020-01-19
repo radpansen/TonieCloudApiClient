@@ -60,6 +60,7 @@ namespace TonieCloudApiClient.Tests
             creativeTonie.Live.ShouldBeFalse();
             creativeTonie.Name.ShouldEqual("Papa-Tonie");
             creativeTonie.Private.ShouldBeFalse();
+            creativeTonie.SecondsRemaining.ShouldNotEqual(0);
             
             var tonieBox = household.TonieBoxes.First(x => x.Name.Contains("Tim"));
             tonieBox.Id

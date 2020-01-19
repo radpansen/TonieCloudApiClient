@@ -2,7 +2,7 @@
 
 namespace TonieCloudApiClient.Models
 {
-    public class TonieBoxListModel
+    public class TonieBoxModel
     {
         public string Id { get; set; }
         public string Name { get; set; }
