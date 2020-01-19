@@ -9,7 +9,7 @@ using TonieCloudApiClient.Extensions;
 using System.Collections.Generic;
 using GraphQL.Client;
 using GraphQL.Common.Request;
-using TonieCloudApiClient.GraphQL;
+using TonieCloudApiClient.GraphQLQueries;
 
 namespace TonieCloudApiClient
 {
@@ -113,8 +113,14 @@ namespace TonieCloudApiClient
         {
             public static async Task<List<NotificationModel>> GetNotificationsAsync()
             {
-                var graphQlResponse = (await GraphQLClient.PostQueryAsync(Queries.NotificationsQuery)).ThrowIfNotSuccessful();
-                return graphQlResponse.GetDataFieldAs<List<NotificationModel>>("notifications");
+                var response = (await GraphQLClient.PostQueryAsync(Queries.NotificationsQuery)).ThrowIfNotSuccessful();
+                return response.GetDataFieldAs<List<NotificationModel>>("notifications");
+            }
+
+            public static async Task<List<HouseholdModel>> GetHouseholdsAsync()
+            {
+                var response = (await GraphQLClient.PostQueryAsync(Queries.HouseholdsQuery)).ThrowIfNotSuccessful();
+                return response.GetDataFieldAs<List<HouseholdModel>>("households");
             }
         }
     }
