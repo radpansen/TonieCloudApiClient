@@ -4,33 +4,34 @@ using System;
 using TonieCloudApiClient.Models;
 using System.Threading.Tasks;
 using TonieCloudApiClient.Config;
+using System.Linq;
+using TonieCloudApiClient.Extensions;
 
 namespace TonieCloudApiClient
 {
     public static class TonieClient
     {
-        private static HttpClient _httpClient;
-        private static  string _userName;
-        private static  char[] _password;
-        private static string _bearerToken = null;
+        private static HttpClient HttpClient;
+        private static string UserName;
+        private static char[] Password;
+        private static string BearerToken = null;
 
-        // HttpClient wird als Singleton verwendet
-        //private TonieClient() { }
-
-        public static async Task<HttpClient> GetClientAsync(string username = null, char[] password = null)
+        public static async Task Initialize(string username, char[] password)
         {
-            if (_httpClient != null)
+            if (string.IsNullOrEmpty(username))
             {
-                return _httpClient;
+                throw new ArgumentNullException(nameof(username));
             }
 
-            if (string.IsNullOrEmpty(username) || password == null)
+            if (password == null || !password.Any())
             {
-                throw new ArgumentException("you have to provide username and password");
+                throw new ArgumentNullException(nameof(password));
             }
 
-            _userName = username;
-            _password = password;
+            if (HttpClient != null)
+            {
+                return;
+            }
 
             var client = new HttpClient();
             client.BaseAddress = new Uri($"{Urls.BaseUrl}/");
@@ -39,23 +40,25 @@ namespace TonieCloudApiClient
                 .Accept
                 .Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            await SetupAuthenticationAsync(client);
-            _httpClient = client;
-            return client;
+            await SetupAuthenticationAsync(client, username, password);
+
+            HttpClient = client;
         }
 
-        private static async Task SetupAuthenticationAsync(HttpClient client)
+        private static async Task SetupAuthenticationAsync(HttpClient client, string username, char[] password)
         {
-            if (string.IsNullOrEmpty(_bearerToken))
+            if (string.IsNullOrEmpty(BearerToken))
             {
-                _bearerToken = await GetBearerTokenAsync(client);
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _bearerToken);
+                UserName = username;
+                Password = password;
+                BearerToken = await GetBearerTokenAsync(client);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", BearerToken);
             }
         }
 
         private static async Task<string> GetBearerTokenAsync(HttpClient client)
         {
-            var model = new SessionsPostModel { Email = _userName, Password = string.Concat(_password) };
+            var model = new SessionsPostModel { Email = UserName, Password = string.Concat(Password) };
             using var response = await client.PostAsJsonAsync(Urls.Sessions, model);
             if (!response.IsSuccessStatusCode)
             {
